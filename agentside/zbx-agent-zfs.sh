@@ -12,6 +12,7 @@ cat >"/etc/zabbix/zabbix_agentd.d/userparameter_zfs.conf"<<'EOF'
 UserParameter=zpool.discover,/bin/discover-zfspool.sh
 UserParameter=zpool.health[*],sudo zpool list -H -o health $1
 UserParameter=zpool.stat[*],sudo zpool iostat $1 -y |tail -n 1
+
 # Unit is a count, not cumulative
 UserParameter=zpool.ioro.stat[*],sudo zpool iostat $1 5 1 -y |tail -n 1 | awk '{print $$4}'
 # Unit is a count, not cumulative
@@ -20,23 +21,24 @@ UserParameter=zpool.iorw.stat[*],sudo zpool iostat $1 5 1 -y |tail -n 1 | awk '{
 UserParameter=zpool.ro.stat[*],cat /proc/spl/kstat/zfs/$1/io | tail -n +3 | awk '{print $$1}'
 # Unit in Bytes, cumulative
 UserParameter=zpool.rw.stat[*],cat /proc/spl/kstat/zfs/$1/io | tail -n +3 | awk '{print $$2}'
+
 # Unit in %
 UserParameter=zpool.alloc.stat[*],sudo zpool list -H -o cap $1 | tr -d "%"
 # Unit in Kbytes, not cumulative
 #UserParameter=zpool.size.stat[*],df -l | grep -w "$1 " | awk '{print $$2}'
-UserParameter=zpool.size.stat[*],sudo zfs list -p -o refer $1 | tail -n 1 | tr -d ' '
+UserParameter=zpool.size.stat[*],sudo zpool get -H -p size $1 | awk '{print $3}'
 # Unit in Kbytes, not cumulative
 #UserParameter=zpool.used.stat[*],df -l | grep -w "$1 " | awk '{print $$3}'
-UserParameter=zpool.used.stat[*],sudo zfs list -p -o used $1 | tail -n 1 | tr -d ' '
+UserParameter=zpool.used.stat[*],sudo zpool get -H -p allocated $1 | awk '{print $3}'
 # Unit in Kbytes, not cumulative
 #UserParameter=zpool.free.stat[*],df -l | grep -w "$1 " | awk '{print $$4}'
-UserParameter=zpool.free.stat[*],expr `sudo zfs list -p -o avail $1 | tail -n 1 | tr -d ' '` - `sudo zfs list -p -o used $1 | tail -n 1 | tr -d ' '`
+UserParameter=zpool.free.stat[*],sudo zpool get -H -p free $1 | awk '{print $3}'
 
 # DATASETS
 UserParameter=zsets.discover,/bin/discover-zfsdataset.sh
-UserParameter=zsets.mount[*],sudo zfs list -o mounted $1 |tail -n 1|tr -d ' '
-UserParameter=zsets.alloc.stat[*],sudo zfs list -p -o usedds $1 | tail -n 1 |tr -d ' '
-UserParameter=zsets.free.stat[*],sudo zfs list -p -o avail $1 | tail -n 1 |tr -d ' '
+UserParameter=zsets.mount[*],sudo zfs list -H -o mounted $1
+UserParameter=zsets.alloc.stat[*],sudo zfs list -p -H -o usedds $1
+UserParameter=zsets.free.stat[*],sudo zfs list -p -H -o avail $1
 EOF
 
 cat >"/bin/discover-zfspool.sh"<<'EOF'
