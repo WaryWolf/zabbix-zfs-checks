@@ -4,13 +4,13 @@
 For Pool discovery
 ```
 Label	Macro	 	Regular expression
-A	{#ZFSPOOL}	@Linux ZFS Zpool
+A	{$ZFSPOOL}	@Linux ZFS Zpool
 ```
 
 For Dataset discovery
 ```
 Label   Macro           Regular expression
-A	{#ZFSDATASET}	@Linux ZFS Zsets
+A	{$ZFSDATASET}	@Linux ZFS Zsets
 ```
 
 ## ADD THIS TWO REGULAR EXPRESSION TO:
