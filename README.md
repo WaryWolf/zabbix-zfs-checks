@@ -19,4 +19,6 @@ AGENTSIDE: run bash script to install or update zabbix custom commands for the a
 - dataset triggers if not MOUNTED
 - dataset trigger for low space
 
+- increase script Timeout in agent to at least 6s.
+
 ZABBIX SERVER: add the template (xml) and assign it to the host monitored
